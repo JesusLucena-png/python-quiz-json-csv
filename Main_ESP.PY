@@ -1,6 +1,9 @@
 import json
 import random
 import csv
+from datetime import datetime
+
+fecha_actual = datetime.now()
 
 # Categorías de preguntas
 preguntas_peliculas = []
@@ -74,9 +77,9 @@ def mostrar_pregunta(lista_preguntas, numero_pregunta, indice_usuario):
         # Pedir respuesta al usuario
         opcion_usuario = input("\n\033[34m >> \033[0mIngrese una opción: ").upper()
 
-        # Validar nombre (aunque aquí no es necesario)
-        if not nombre.strip():
-            print("\n\033[1;31m" + "-"*60 + f"\nError: Por favor ingrese un nombre." + "\n" + "-"*60 + "\033[0m")
+        # Validar opcion
+        if not opcion_usuario.strip():
+            print("\n\033[1;31m" + "-"*60 + f"\nError: Por favor ingrese un opcion." + "\n" + "-"*60 + "\033[0m")
             continue
 
         # Validar opción
@@ -128,7 +131,7 @@ while juego_activo:
         else:
             # Guardar usuario
             indice_usuario = len(resultados)
-            resultados.append([nombre, True])
+            resultados.append([nombre, fecha_actual])
             validar_nombre = False
 
     puntaje_total = 0

@@ -1,232 +1,232 @@
 import json
 import random
 import csv
+from datetime import datetime
 
-# Lists to store questions by category
-preguntas_peliculas = []
-preguntas_series = []
-preguntas_anime = []
-preguntas_videojuegos = []
-preguntas_musica = []
-preguntas_programacion = []
+fecha_actual = datetime.now()
 
-# List to store each player's results
-resultados = []
+# Question categories
+questions_movies = []
+questions_series = []
+questions_anime = []
+questions_videogames = []
+questions_music = []
+questions_basic_programming = []
 
-# List to store the overall ranking
+# Store player results
+results = []
+
+# Store ranking
 ranking = []
 
-# Open and read the JSON file with the questions
-with open("data.json", "r", encoding="utf-8") as archivo_json:
-    datos = json.loads(archivo_json.read())
+# Load questions from JSON file
+with open("data.json", "r", encoding="utf-8") as file:
+    data = json.loads(file.read())
 
-    # Iterate through each question in the JSON
-    for pregunta in datos:
-        for clave, valor in pregunta.items():
+    # Iterate through all questions
+    for question in data:
+        for key, value in question.items():
 
-            # Classify questions based on their category
-            if clave == "categoria" and valor == "Películas":
-                preguntas_peliculas.append(pregunta)
+            # Classify questions by category
+            if key == "categoria" and value == "Películas":
+                questions_movies.append(question)
 
-            elif clave == "categoria" and valor == "Series":
-                preguntas_series.append(pregunta)
+            elif key == "categoria" and value == "Series":
+                questions_series.append(question)
 
-            elif clave == "categoria" and valor == "Anime":
-                preguntas_anime.append(pregunta)
+            elif key == "categoria" and value == "Anime":
+                questions_anime.append(question)
 
-            elif clave == "categoria" and valor == "Videojuegos":
-                preguntas_videojuegos.append(pregunta)
+            elif key == "categoria" and value == "Videojuegos":
+                questions_videogames.append(question)
 
-            elif clave == "categoria" and valor == "Música":
-                preguntas_musica.append(pregunta)
+            elif key == "categoria" and value == "Música":
+                questions_music.append(question)
 
-            elif clave == "categoria" and valor == "Programación Básica":
-                preguntas_programacion.append(pregunta)
-
-
-# Function to confirm if the user wants to exit the game
-def confirmar_salida(mensaje="Press (n) to exit or any key to continue: "):
+            elif key == "categoria" and value == "Programación Básica":
+                questions_basic_programming.append(question)
     
-    opcion_usuario = input(f"\n\033[31m >> \033[0m{mensaje}").strip().lower()
+
+# Function to confirm if the user wants to exit
+def confirm_exit(message="Press (n) to finish and any key to continue: "):
+    
+    user_option = input(f"\n\033[31m >> \033[0m{message}").strip().lower()
         
-    if opcion_usuario == "n":
+    if user_option == "n":
         return True     
 
 
-# Function to display a random question from a list
-def mostrar_pregunta(lista_preguntas, numero_pregunta, indice_usuario):
+# Function to display a random question
+def show_question(question_list, question_counter, user_index):
     
     # Select a random question
-    indice_aleatorio = random.randint(0, len(lista_preguntas) - 1)
-    pregunta_actual = lista_preguntas[indice_aleatorio]
+    random_index = random.randint(0, len(question_list) - 1)
+    question_data = question_list[random_index]
 
-    # Display the question text
-    print(f"\n{numero_pregunta}. {pregunta_actual.get('pregunta')}\n")
+    # Print question
+    print(f"\n{question_counter}. {question_data.get('pregunta')}\n")
 
-    # Get answer options
-    opciones = pregunta_actual.get("opciones")
+    # Get options
+    options = question_data.get("opciones")
 
-    # Display each option
-    for opcion, valor in opciones.items():
-        print(f"{opcion}. {valor}")
+    # Display options
+    for option, value in options.items():
+        print(f"{option}. {value}")
 
-    opcion_valida = True
-    while opcion_valida:
+    valid_option = True
+    while valid_option:
         
-        # Ask for user's answer
-        opcion_usuario = input("\n\033[34m >> \033[0mEnter an option: ").upper()
+        # Ask user for input
+        selected_option = input("\n\033[34m >> \033[0mEnter an option: ").upper()
 
-        # Validate that the name is not empty (not really needed here)
-        if not nombre.strip():
-            print("\n\033[1;31m" + "-"*60 + f"\nError: Please enter a name." + "\n" + "-"*60 + "\033[0m")
+        # Validate name (not necessary here but kept as original logic)
+        if not selected_option.strip():
+            print("\n\033[1;31m" + "-"*60 + f"\nError: Please enter a option." + "\n" + "-"*60 + "\033[0m")
             continue
 
-        # Check if the option is valid
-        if opcion_usuario in ["A", "B", "C", "D"]:
+        # Validate option
+        if selected_option in ["A", "B", "C", "D"]:
             
-            # Check if the answer is correct
-            if opcion_usuario == pregunta_actual.get("respuesta_correcta"):
+            # Check correct answer
+            if selected_option == question_data.get("respuesta_correcta"):
                 print("\n\033[1;32m+ 20 points\033[0m")
 
-                # Save correct answer result
-                resultados[indice_usuario].append({
-                    "pregunta": pregunta_actual.get("pregunta"),
-                    "opcion": opcion_usuario,
+                # Save correct result
+                results[user_index].append({
+                    "pregunta": question_data.get("pregunta"),
+                    "opcion": selected_option,
                     "puntos": 20,
                 })
                 return 20
             else:
                 print("\n\033[1;31m+ 0 points\033[0m")
 
-                # Save incorrect answer result
-                resultados[indice_usuario].append({
-                    "pregunta": pregunta_actual.get("pregunta"),
-                    "opcion": opcion_usuario,
+                # Save incorrect result
+                results[user_index].append({
+                    "pregunta": question_data.get("pregunta"),
+                    "opcion": selected_option,
                     "puntos": 0,
                 })
                 return 0
         else:
-            # Error message for invalid option
+            # Invalid option message
             print("\n\033[1;31m" + "-"*60 + f"\nError: Please enter a valid option." + "\n" + "-"*60 + "\033[0m")
             continue
-    
-    opcion_valida = False
 
 
-# Game control variable
-juego_activo = True
+# Game control
+game_active = True
+while game_active:
 
-# Main game loop
-while juego_activo:
+    validate_name = True
+    while validate_name:
 
-    validar_nombre = True
-    while validar_nombre:
-
-        # Display visual separator
+        # UI separator
         print("\033[34m" + "-"*60 + "\033[0m")
 
-        # Ask for user's name
+        # Ask for username
         nombre = input("\n\033[34m >> \033[0mEnter user name: ")
 
         print("\033[34m" + "-"*60 + "\033[0m")
 
-        # Validate name is not empty
+        # Validate input
         if not nombre.strip():
             print("\n\033[1;31m" + "-"*60 + f"\nError: Please enter a name." + "\n" + "-"*60 + "\033[0m")
             continue
         else:
-            # Store user in results
-            indice_usuario = len(resultados)
-            resultados.append([nombre, True])
-            validar_nombre = False
-    
-    puntaje_total = 0
-    numero_pregunta = 1
-    categorias_aleatorias = random.sample(range(0, 6), 5)
+            # Save user
+            user_index = len(results)
+            results.append([nombre, fecha_actual])
+            validate_name = False
 
-    while numero_pregunta != 5:
+    total_score = 0
+    question_number = 1
 
-        # List of all question categories
-        listas_preguntas = [
-            preguntas_peliculas,
-            preguntas_series,
-            preguntas_anime,
-            preguntas_musica,
-            preguntas_videojuegos,
-            preguntas_programacion
+    # Select 5 random categories
+    random_categories = random.sample(range(0, 6), 5)
+
+    while question_number != 5:
+
+        # All category lists
+        question_lists = [
+            questions_movies,
+            questions_series,
+            questions_anime,
+            questions_music,
+            questions_videogames,
+            questions_basic_programming
         ]
 
-        # Iterate through random categories
-        for num in categorias_aleatorias:
-            puntos = mostrar_pregunta(listas_preguntas[num], numero_pregunta, indice_usuario)
-            puntaje_total += puntos
-            numero_pregunta += 1
+        # Iterate through selected categories
+        for num in random_categories:
+            score = show_question(question_lists[num], question_number, user_index)
+            total_score += score
+            question_number += 1
             print("\033[34m" + "-"*60 + "\033[0m")
         
         break
 
     # Save total score
-    resultados[indice_usuario].append(puntaje_total)
+    results[user_index].append(total_score)
 
     print("\033[34m" + "-"*60 + "\033[0m")
 
-    # Display user results
-    print(f"Name: {resultados[indice_usuario][0]}")
-    print(f"Date: {resultados[indice_usuario][1]}")
+    # Show summary
+    print(f"Name: {results[user_index][0]}")
+    print(f"Date: {results[user_index][1]}")
 
-    # Show each answered question
-    for i, pregunta_guardada in enumerate(resultados[indice_usuario][2:7]):
-        print(f"\n{i+1}. {pregunta_guardada['pregunta']}")
-        print(f"Selected option: {pregunta_guardada['opcion']}  |  Points earned: {pregunta_guardada['puntos']}\n")
+    # Show each question result
+    for i, question_data in enumerate(results[user_index][2:7]):
+        print(f"\n{i+1}. {question_data['pregunta']}")
+        print(f"Selected Option: {question_data['opcion']}  |  Points: {question_data['puntos']}\n")
     
-    print(f"Total points: {resultados[indice_usuario][7]}")
+    print(f"Total Points: {results[user_index][7]}")
 
     # Add to ranking
-    ranking.append([resultados[indice_usuario][0], resultados[indice_usuario][7]])
+    ranking.append([results[user_index][0], results[user_index][7]])
 
     print("\033[34m" + "-"*60 + "\033[0m")
 
-    # Ask if user wants to exit
-    salir = confirmar_salida()
-    if salir == True:
-        juego_activo = False
+    # Ask to exit
+    exit_game = confirm_exit()
+    if exit_game:
+        game_active = False
     else:
         continue
 
 
-# Save ranking to CSV file
-with open("ranking.csv", mode='a', newline='', encoding='utf-8') as archivo_csv:
-    escritor = csv.writer(archivo_csv)
-    escritor.writerows(ranking)
+# Save ranking to CSV
+with open("ranking.csv", mode='a', newline='', encoding='utf-8') as file:
+    writer = csv.writer(file)
+    writer.writerows(ranking)
 
 
-# Reload ranking from file
+# Reload ranking from CSV
 ranking = []
 try:
-    with open("ranking.csv", mode='r', encoding='utf-8') as archivo_csv:
-        lector = csv.reader(archivo_csv)
-        for fila in lector:
-            if fila:
-                ranking.append([fila[0], int(fila[1])])
+    with open("ranking.csv", mode='r', encoding='utf-8') as file:
+        reader = csv.reader(file)
+        for row in reader:
+            if row:
+                ranking.append([row[0], int(row[1])])
 except FileNotFoundError:
-    print("The ranking.csv file does not exist yet.")
+    print("The file ranking.csv does not exist yet.")
 
 
-# Sort ranking by score (descending)
+# Sort ranking (highest score first)
 ranking.sort(key=lambda x: x[1], reverse=True)
-posicion = 0
 
-# Display ranking table
+# Display ranking
 print("\n\033[34m" + "-"*60 + "\033[0m")
 print("RANKING")
 print("\033[34m" + "-"*60 + "\033[0m")
 print(f"{'POSITION':<8} {'NAME':<10} - {'POINTS':<10}")
 print("\033[34m" + "-"*60 + "\033[0m")
 
-# Show top 10 players
-for fila in ranking:
-    posicion += 1
-    print(f"{posicion:<8} {fila[0]:<10} - {fila[1]:<10}")
+# Show top 10
+for cont, row in enumerate(ranking):
 
-    if posicion == 10:
+    print(f"{cont+1:<8} {row[0]:<10} - {row[1]:<10}")
+
+    if cont+1 == 10:
         break
